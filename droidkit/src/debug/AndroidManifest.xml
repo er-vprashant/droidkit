@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <application>
+        <provider
+            android:name="com.prashant.droidkit.core.init.DroidKitInitializer"
+            android:authorities="${applicationId}.droidkit-init"
+            android:exported="false" />
+
+        <activity
+            android:name="com.prashant.droidkit.ui.DroidKitActivity"
+            android:launchMode="singleTop"
+            android:theme="@style/Theme.DroidKit"
+            android:exported="false" />
+    </application>
+
+</manifest>
