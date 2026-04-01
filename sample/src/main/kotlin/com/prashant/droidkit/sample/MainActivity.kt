@@ -61,14 +61,22 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.prashant.droidkit.DroidKit
 import kotlinx.coroutines.delay
 
 class MainActivity : ComponentActivity() {
+
+    private val notifPermissionLauncher = registerForActivityResult(
+        androidx.activity.result.contract.ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (granted) DroidKit.refreshNotification()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         seedSampleData()
+        requestNotificationPermission()
 
         setContent {
             SampleTheme {
@@ -78,7 +86,7 @@ class MainActivity : ComponentActivity() {
                 ) {
                     SampleApp(
                         deepLinkUri = intent?.data?.toString(),
-                        onOpenDroidKit = { openDroidKit() }
+                        onOpenDroidKit = { DroidKit.launch(this) }
                     )
                 }
             }
@@ -91,12 +99,10 @@ class MainActivity : ComponentActivity() {
         recreate()
     }
 
-    private fun openDroidKit() {
-        try {
-            val cls = Class.forName("com.prashant.droidkit.DroidKit")
-            val launchMethod = cls.getMethod("launch", Context::class.java)
-            launchMethod.invoke(cls.getDeclaredField("INSTANCE").get(null), this)
-        } catch (_: Exception) { }
+    private fun requestNotificationPermission() {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            notifPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+        }
     }
 
     private fun seedSampleData() {

@@ -12,6 +12,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import com.prashant.droidkit.R
+import com.prashant.droidkit.ui.DroidKitActivity
 
 internal object NotificationLauncher {
 
@@ -19,6 +20,13 @@ internal object NotificationLauncher {
     private const val NOTIF_ID = 7390
 
     fun show(context: Context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+            ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS)
+            != PackageManager.PERMISSION_GRANTED
+        ) {
+            return
+        }
+
         val nm = NotificationManagerCompat.from(context)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -29,13 +37,8 @@ internal object NotificationLauncher {
             nm.createNotificationChannel(channel)
         }
 
-        val intent = try {
-            val activityClass = Class.forName("com.prashant.droidkit.ui.DroidKitActivity")
-            Intent(context, activityClass).apply {
-                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            }
-        } catch (e: ClassNotFoundException) {
-            return
+        val intent = Intent(context, DroidKitActivity::class.java).apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
 
         val pi = PendingIntent.getActivity(
@@ -52,12 +55,6 @@ internal object NotificationLauncher {
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .build()
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
-            ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS)
-            != PackageManager.PERMISSION_GRANTED
-        ) {
-            return
-        }
         nm.notify(NOTIF_ID, notification)
     }
 
