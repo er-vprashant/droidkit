@@ -9,6 +9,7 @@ jobs:
   publish:
     name: Build, Sign & Publish
     runs-on: ubuntu-latest
+    environment: droidkit
     permissions:
       contents: read
 

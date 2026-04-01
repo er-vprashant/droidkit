@@ -165,7 +165,7 @@ Then shake the device or tap the notification to open DroidKit.
 ## License
 
 ```
-Copyright 2024 Prashant Verma
+Copyright 2026 Prashant Verma
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
