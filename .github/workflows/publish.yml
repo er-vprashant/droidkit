@@ -26,13 +26,6 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
 
-      - name: Import GPG key
-        run: |
-          echo "${{ secrets.GPG_SIGNING_KEY }}" | gpg --batch --import
-          gpg --batch --yes --pinentry-mode loopback \
-            --passphrase "${{ secrets.GPG_SIGNING_PASSWORD }}" \
-            --export-secret-keys --output /tmp/secring.gpg
-
       - name: Extract version from tag
         id: version
         run: echo "VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
@@ -40,9 +33,9 @@ jobs:
       - name: Build, sign & bundle
         run: ./gradlew :droidkit:bundleCentralPortal --no-daemon
         env:
-          ORG_GRADLE_PROJECT_signing.keyId: ${{ secrets.GPG_SIGNING_KEY_ID }}
-          ORG_GRADLE_PROJECT_signing.password: ${{ secrets.GPG_SIGNING_PASSWORD }}
-          ORG_GRADLE_PROJECT_signing.secretKeyRingFile: /tmp/secring.gpg
+          ORG_GRADLE_PROJECT_signingInMemoryKeyId: ${{ secrets.GPG_SIGNING_KEY_ID }}
+          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.GPG_SIGNING_KEY }}
+          ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.GPG_SIGNING_PASSWORD }}
           ORG_GRADLE_PROJECT_POM_VERSION: ${{ steps.version.outputs.VERSION }}
 
       - name: Upload bundle to Central Portal
@@ -70,7 +63,7 @@ jobs:
           echo "Track at: https://central.sonatype.com/publishing/deployments"
 
 # ──────────────────────────────────────────────────────────
-# Required GitHub repository secrets:
+# Required GitHub secrets (environment: droidkit):
 #
 #   MAVEN_CENTRAL_USERNAME    Token username from central.sonatype.com
 #                             → Account → Generate User Token
