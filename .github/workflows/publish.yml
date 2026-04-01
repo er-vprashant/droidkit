@@ -1,0 +1,82 @@
+name: Publish to Maven Central
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  publish:
+    name: Build, Sign & Publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Import GPG key
+        run: |
+          echo "${{ secrets.GPG_SIGNING_KEY }}" | gpg --batch --import
+          gpg --batch --yes --pinentry-mode loopback \
+            --passphrase "${{ secrets.GPG_SIGNING_PASSWORD }}" \
+            --export-secret-keys --output /tmp/secring.gpg
+
+      - name: Extract version from tag
+        id: version
+        run: echo "VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Build, sign & bundle
+        run: ./gradlew :droidkit:bundleCentralPortal --no-daemon
+        env:
+          ORG_GRADLE_PROJECT_signing.keyId: ${{ secrets.GPG_SIGNING_KEY_ID }}
+          ORG_GRADLE_PROJECT_signing.password: ${{ secrets.GPG_SIGNING_PASSWORD }}
+          ORG_GRADLE_PROJECT_signing.secretKeyRingFile: /tmp/secring.gpg
+          ORG_GRADLE_PROJECT_POM_VERSION: ${{ steps.version.outputs.VERSION }}
+
+      - name: Upload bundle to Central Portal
+        run: |
+          BUNDLE=droidkit/build/central-portal/central-portal-bundle.zip
+          TOKEN=$(echo -n "${{ secrets.MAVEN_CENTRAL_USERNAME }}:${{ secrets.MAVEN_CENTRAL_PASSWORD }}" | base64)
+
+          RESPONSE=$(curl -s -w "\n%{http_code}" \
+            -X POST "https://central.sonatype.com/api/v1/publisher/upload?publishingType=AUTOMATIC" \
+            -H "Authorization: Bearer ${TOKEN}" \
+            -F "bundle=@${BUNDLE}")
+
+          HTTP_CODE=$(echo "$RESPONSE" | tail -1)
+          BODY=$(echo "$RESPONSE" | head -n -1)
+
+          echo "HTTP status: ${HTTP_CODE}"
+          echo "Response: ${BODY}"
+
+          if [ "$HTTP_CODE" -ge 400 ]; then
+            echo "::error::Central Portal upload failed with HTTP ${HTTP_CODE}"
+            exit 1
+          fi
+
+          echo "Deployment ID: ${BODY}"
+          echo "Track at: https://central.sonatype.com/publishing/deployments"
+
+# ──────────────────────────────────────────────────────────
+# Required GitHub repository secrets:
+#
+#   MAVEN_CENTRAL_USERNAME    Token username from central.sonatype.com
+#                             → Account → Generate User Token
+#   MAVEN_CENTRAL_PASSWORD    Token password from same dialog
+#
+#   GPG_SIGNING_KEY_ID        Last 8 chars of your GPG key ID
+#   GPG_SIGNING_KEY           ASCII-armored private key:
+#                             gpg --armor --export-secret-keys <KEY_ID>
+#   GPG_SIGNING_PASSWORD      GPG key passphrase
+# ──────────────────────────────────────────────────────────

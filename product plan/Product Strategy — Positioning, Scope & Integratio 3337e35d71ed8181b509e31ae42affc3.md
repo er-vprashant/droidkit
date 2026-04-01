@@ -114,7 +114,7 @@ One line in `build.gradle`. Zero release APK footprint. Toolkit auto-initialises
 
 ```kotlin
 dependencies {
-    debugImplementation 'io.github.pverma:droidkit:1.0.0'
+    debugImplementation 'io.github.er-vprashant:droidkit:1.0.0'
 }
 ```
 
@@ -129,7 +129,7 @@ Developer calls `DroidKit.init(this)` in `Application.onCreate()`. More explicit
 ```kotlin
 // In app/build.gradle
 dependencies {
-    debugImplementation 'io.github.pverma:droidkit:1.0.0'
+    debugImplementation 'io.github.er-vprashant:droidkit:1.0.0'
 }
 ```
 
@@ -225,7 +225,7 @@ Steps:
 
 ### Publishing (Maven Central via Sonatype)
 
-- Group ID: `io.github.pverma`
+- Group ID: `io.github.er-vprashant`
 - Artifact ID: `droidkit`
 - Use `maven-publish` + `signing` Gradle plugins
 - Publish via GitHub Actions on tag push (`v1.0.0`)

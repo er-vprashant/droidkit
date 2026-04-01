@@ -35,14 +35,14 @@ droidkit/
 └── src/
     ├── debug/
     │   ├── AndroidManifest.xml                  ← DroidKitInitializer + DroidKitActivity declared here ONLY
-    │   └── kotlin/io/github/pverma/droidkit/
+    │   └── kotlin/io/github/er-vprashant/droidkit/
     │       ├── core/init/
     │       │   └── DroidKitInitializer.kt        ← ContentProvider (debug-only class)
     │       └── ui/
     │           └── DroidKitActivity.kt           ← single Activity, hosts NavHost (debug-only class)
     ├── main/
     │   ├── AndroidManifest.xml                   ← empty
-    │   └── kotlin/io/github/pverma/droidkit/
+    │   └── kotlin/io/github/er-vprashant/droidkit/
     │       ├── DroidKit.kt                       ← public API surface (object)
     │       ├── DroidKitConfig.kt                 ← builder pattern + Module enum
     │       ├── internal/
@@ -96,7 +96,7 @@ plugins {
 }
 
 android {
-    namespace = "io.github.pverma.droidkit"
+    namespace = "io.github.er-vprashant.droidkit"
     compileSdk = 34
 
     defaultConfig {
@@ -139,7 +139,7 @@ dependencies {
 ```kotlin
 // app/build.gradle.kts
 dependencies {
-    debugImplementation("io.github.pverma:droidkit:1.0.0")
+    debugImplementation("io.github.er-vprashant:droidkit:1.0.0")
     // Nothing else needed. No Hilt, no plugins, no init code.
 }
 ```
@@ -668,13 +668,13 @@ fun DroidKitTheme(content: @Composable () -> Unit) {
 
 ```
 src/
-├── test/kotlin/io/github/pverma/droidkit/     ← unit tests
+├── test/kotlin/io/github/er-vprashant/droidkit/     ← unit tests
 │   ├── core/storage/PrefsReaderTest.kt
 │   ├── core/storage/DbInspectorTest.kt
 │   ├── core/intent/IntentFirerTest.kt
 │   ├── core/intent/HistoryRepositoryTest.kt
 │   └── core/shake/ShakeDetectorTest.kt
-└── androidTest/kotlin/io/github/pverma/droidkit/  ← instrumentation tests
+└── androidTest/kotlin/io/github/er-vprashant/droidkit/  ← instrumentation tests
     └── ui/NavigationTest.kt
 ```
 
