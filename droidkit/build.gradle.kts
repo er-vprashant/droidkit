@@ -28,12 +28,6 @@ android {
         jvmTarget = "17"
     }
 
-    sourceSets {
-        getByName("debug") {
-            manifest.srcFile("src/debug/AndroidManifest.xml")
-        }
-    }
-
     publishing {
         singleVariant("release") {
             withSourcesJar()

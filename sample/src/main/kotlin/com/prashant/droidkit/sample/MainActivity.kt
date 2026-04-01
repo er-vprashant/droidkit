@@ -412,5 +412,3 @@ private fun SampleAppWithDeepLinkPreview() {
         }
     }
 }
-
-
