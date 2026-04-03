@@ -43,5 +43,5 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-tooling")
 
     // DroidKit — debug only
-    debugImplementation(project(":droidkit"))
+    debugImplementation("io.github.er-vprashant:droidkit:1.0.1")
 }
