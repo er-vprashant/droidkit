@@ -9,6 +9,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.prashant.droidkit.ui.dashboard.DashboardScreen
 import com.prashant.droidkit.ui.deeplink.DeepLinkTesterScreen
+import com.prashant.droidkit.ui.network.NetworkSetupScreen
 import com.prashant.droidkit.ui.notification.NotificationTesterScreen
 import com.prashant.droidkit.ui.storage.StorageInspectorScreen
 import com.prashant.droidkit.ui.theme.DroidKitTheme
@@ -32,5 +33,6 @@ private fun DroidKitNavHost() {
         composable("storage") { StorageInspectorScreen() }
         composable("deeplink") { DeepLinkTesterScreen() }
         composable("notifications") { NotificationTesterScreen() }
+        composable("network_setup") { NetworkSetupScreen(navController) }
     }
 }
