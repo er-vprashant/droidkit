@@ -63,6 +63,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.prashant.droidkit.DroidKit
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import androidx.lifecycle.lifecycleScope
 
 class MainActivity : ComponentActivity() {
 
@@ -77,6 +79,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         seedSampleData()
         requestNotificationPermission()
+        makeTestNetworkCalls()
 
         setContent {
             SampleTheme {
@@ -102,6 +105,80 @@ class MainActivity : ComponentActivity() {
     private fun requestNotificationPermission() {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
             notifPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+        }
+    }
+
+    private fun makeTestNetworkCalls() {
+        val api = TestApi.create()
+        lifecycleScope.launch {
+            try {
+                delay(500)
+                api.getProducts(limit = 10)
+                
+                delay(300)
+                api.getProduct(5)
+                
+                delay(400)
+                api.searchProducts("phone")
+                
+                delay(300)
+                api.getUsers()
+                
+                delay(400)
+                api.getUser(3)
+                
+                delay(500)
+                api.getCarts()
+                
+                delay(300)
+                api.getCart(1)
+                
+                delay(400)
+                api.addCart(
+                    mapOf(
+                        "userId" to 1,
+                        "products" to listOf(
+                            mapOf("id" to 1, "quantity" to 2),
+                            mapOf("id" to 50, "quantity" to 1)
+                        )
+                    )
+                )
+                
+                delay(400)
+                api.updateCart(
+                    1,
+                    mapOf(
+                        "merge" to false,
+                        "products" to listOf(
+                            mapOf("id" to 1, "quantity" to 5)
+                        )
+                    )
+                )
+                
+                delay(300)
+                api.getPosts(limit = 5)
+                
+                delay(400)
+                api.getPost(1)
+                
+                delay(500)
+                api.addPost(
+                    mapOf(
+                        "title" to "Test Post from DroidKit Demo",
+                        "body" to "This is a test post created via the Network Inspector demo",
+                        "userId" to 5
+                    )
+                )
+                
+                delay(300)
+                api.getComments(limit = 5)
+                
+                delay(400)
+                api.deleteCart(1)
+                
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
     }
 
@@ -268,6 +345,13 @@ private fun SampleApp(deepLinkUri: String?, onOpenDroidKit: () -> Unit) {
             title = "Push Notification Tester",
             description = "Compose and send local notifications with live preview. Test channels, deep link tap actions.",
             accent = Color(0xFFBA7517)
+        )
+        Spacer(modifier = Modifier.height(10.dp))
+        FeatureCard(
+            icon = Icons.Default.PhoneAndroid,
+            title = "Network Inspector",
+            description = "Inspect HTTP calls, mock responses, test error scenarios. Copy as cURL, filter by method/status.",
+            accent = Color(0xFF9C27B0)
         )
 
         Spacer(modifier = Modifier.height(24.dp))
