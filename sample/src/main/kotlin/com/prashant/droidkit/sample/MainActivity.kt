@@ -113,11 +113,69 @@ class MainActivity : ComponentActivity() {
         lifecycleScope.launch {
             try {
                 delay(500)
-                api.getPosts()
+                api.getProducts(limit = 10)
+                
                 delay(300)
+                api.getProduct(5)
+                
+                delay(400)
+                api.searchProducts("phone")
+                
+                delay(300)
+                api.getUsers()
+                
+                delay(400)
+                api.getUser(3)
+                
+                delay(500)
+                api.getCarts()
+                
+                delay(300)
+                api.getCart(1)
+                
+                delay(400)
+                api.addCart(
+                    mapOf(
+                        "userId" to 1,
+                        "products" to listOf(
+                            mapOf("id" to 1, "quantity" to 2),
+                            mapOf("id" to 50, "quantity" to 1)
+                        )
+                    )
+                )
+                
+                delay(400)
+                api.updateCart(
+                    1,
+                    mapOf(
+                        "merge" to false,
+                        "products" to listOf(
+                            mapOf("id" to 1, "quantity" to 5)
+                        )
+                    )
+                )
+                
+                delay(300)
+                api.getPosts(limit = 5)
+                
+                delay(400)
                 api.getPost(1)
+                
+                delay(500)
+                api.addPost(
+                    mapOf(
+                        "title" to "Test Post from DroidKit Demo",
+                        "body" to "This is a test post created via the Network Inspector demo",
+                        "userId" to 5
+                    )
+                )
+                
                 delay(300)
-                api.getUser(1)
+                api.getComments(limit = 5)
+                
+                delay(400)
+                api.deleteCart(1)
+                
             } catch (e: Exception) {
                 e.printStackTrace()
             }
