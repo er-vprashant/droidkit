@@ -158,13 +158,13 @@ internal fun DashboardScreen(
                     accentColor = DroidKitColors.NotifAmber,
                     onClick = { navController.navigate("notifications") }
                 )
-                SetupCard(
+                ModuleCard(
                     modifier = Modifier.weight(1f),
                     title = "Network Inspector",
-                    subtitle = "Setup required",
+                    subtitle = "HTTP · Mocking",
                     icon = Icons.Default.NetworkCheck,
-                    accentColor = DroidKitColors.LinkGreen,
-                    onClick = { navController.navigate("network_setup") }
+                    accentColor = Color(0xFF9C27B0),
+                    onClick = { navController.navigate("network") }
                 )
             }
 

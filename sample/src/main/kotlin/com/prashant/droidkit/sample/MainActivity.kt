@@ -63,6 +63,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.prashant.droidkit.DroidKit
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import androidx.lifecycle.lifecycleScope
 
 class MainActivity : ComponentActivity() {
 
@@ -77,6 +79,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         seedSampleData()
         requestNotificationPermission()
+        makeTestNetworkCalls()
 
         setContent {
             SampleTheme {
@@ -102,6 +105,22 @@ class MainActivity : ComponentActivity() {
     private fun requestNotificationPermission() {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
             notifPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+        }
+    }
+
+    private fun makeTestNetworkCalls() {
+        val api = TestApi.create()
+        lifecycleScope.launch {
+            try {
+                delay(500)
+                api.getPosts()
+                delay(300)
+                api.getPost(1)
+                delay(300)
+                api.getUser(1)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
     }
 
@@ -268,6 +287,13 @@ private fun SampleApp(deepLinkUri: String?, onOpenDroidKit: () -> Unit) {
             title = "Push Notification Tester",
             description = "Compose and send local notifications with live preview. Test channels, deep link tap actions.",
             accent = Color(0xFFBA7517)
+        )
+        Spacer(modifier = Modifier.height(10.dp))
+        FeatureCard(
+            icon = Icons.Default.PhoneAndroid,
+            title = "Network Inspector",
+            description = "Inspect HTTP calls, mock responses, test error scenarios. Copy as cURL, filter by method/status.",
+            accent = Color(0xFF9C27B0)
         )
 
         Spacer(modifier = Modifier.height(24.dp))

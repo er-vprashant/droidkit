@@ -6,9 +6,11 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import com.prashant.droidkit.core.launcher.NotificationLauncher
+import com.prashant.droidkit.core.network.DroidKitNetworkInterceptor
 import com.prashant.droidkit.core.shake.ShakeDetector
 import com.prashant.droidkit.internal.DroidKitServiceLocator
 import com.prashant.droidkit.ui.DroidKitActivity
+import okhttp3.Interceptor
 
 object DroidKit {
 
@@ -52,6 +54,22 @@ object DroidKit {
 
     /** Builder for teams that need explicit control */
     fun builder() = DroidKitConfig.Builder()
+
+    /**
+     * Returns an OkHttp Interceptor for network inspection and mocking.
+     * Add this to your OkHttpClient:
+     * ```
+     * val client = OkHttpClient.Builder()
+     *     .addInterceptor(DroidKit.networkInterceptor())
+     *     .build()
+     * ```
+     */
+    fun networkInterceptor(): Interceptor {
+        val ctx = appContext ?: throw IllegalStateException(
+            "DroidKit not initialized. Ensure DroidKit is auto-initialized or call DroidKit.builder().build(context)."
+        )
+        return DroidKitNetworkInterceptor(ctx)
+    }
 
     private fun registerLifecycleIfNeeded(context: Context) {
         if (lifecycleRegistered) return
