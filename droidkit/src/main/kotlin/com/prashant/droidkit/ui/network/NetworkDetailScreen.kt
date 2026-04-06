@@ -1,22 +1,26 @@
 package com.prashant.droidkit.ui.network
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -31,6 +35,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
@@ -54,6 +59,8 @@ internal fun NetworkDetailScreen(
     val call = NetworkCallRepository.getById(callId)
     var selectedTab by remember { mutableStateOf(0) }
     var showMenu by remember { mutableStateOf(false) }
+    var isRequestBeautified by remember { mutableStateOf(false) }
+    var isResponseBeautified by remember { mutableStateOf(false) }
     val clipboardManager = LocalClipboardManager.current
 
     if (call == null) {
@@ -148,8 +155,16 @@ internal fun NetworkDetailScreen(
 
             when (selectedTab) {
                 0 -> OverviewTab(call)
-                1 -> RequestTab(call)
-                2 -> ResponseTab(call)
+                1 -> RequestTab(
+                    call = call,
+                    isBeautified = isRequestBeautified,
+                    onBeautifyToggle = { isRequestBeautified = !isRequestBeautified }
+                )
+                2 -> ResponseTab(
+                    call = call,
+                    isBeautified = isResponseBeautified,
+                    onBeautifyToggle = { isResponseBeautified = !isResponseBeautified }
+                )
             }
         }
     }
@@ -186,7 +201,11 @@ private fun OverviewTab(call: NetworkCall) {
 }
 
 @Composable
-private fun RequestTab(call: NetworkCall) {
+private fun RequestTab(
+    call: NetworkCall,
+    isBeautified: Boolean,
+    onBeautifyToggle: () -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -211,23 +230,54 @@ private fun RequestTab(call: NetworkCall) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Text(
-            "Body",
-            fontWeight = FontWeight.SemiBold,
-            fontSize = 14.sp,
-            color = MaterialTheme.colorScheme.onBackground
-        )
+        androidx.compose.foundation.layout.Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                "Body",
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 14.sp,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+            
+            if (!call.requestBody.isNullOrEmpty() && isJsonContent(call.requestBody)) {
+                FilterChip(
+                    selected = isBeautified,
+                    onClick = onBeautifyToggle,
+                    label = { Text(if (isBeautified) "Raw" else "Beautify", fontSize = 12.sp) },
+                    leadingIcon = {
+                        Icon(
+                            Icons.Default.Code,
+                            contentDescription = null,
+                            modifier = Modifier.size(16.dp)
+                        )
+                    }
+                )
+            }
+        }
+        
         Spacer(modifier = Modifier.height(8.dp))
         if (call.requestBody.isNullOrEmpty()) {
             Text("Empty", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
         } else {
-            CodeBlock(call.requestBody)
+            val displayBody = if (isBeautified) {
+                beautifyJson(call.requestBody)
+            } else {
+                call.requestBody
+            }
+            CodeBlock(displayBody)
         }
     }
 }
 
 @Composable
-private fun ResponseTab(call: NetworkCall) {
+private fun ResponseTab(
+    call: NetworkCall,
+    isBeautified: Boolean,
+    onBeautifyToggle: () -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -252,12 +302,34 @@ private fun ResponseTab(call: NetworkCall) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Text(
-            "Body",
-            fontWeight = FontWeight.SemiBold,
-            fontSize = 14.sp,
-            color = MaterialTheme.colorScheme.onBackground
-        )
+        androidx.compose.foundation.layout.Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                "Body",
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 14.sp,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+            
+            if (!call.responseBody.isNullOrEmpty() && isJsonContent(call.responseBody)) {
+                FilterChip(
+                    selected = isBeautified,
+                    onClick = onBeautifyToggle,
+                    label = { Text(if (isBeautified) "Raw" else "Beautify", fontSize = 12.sp) },
+                    leadingIcon = {
+                        Icon(
+                            Icons.Default.Code,
+                            contentDescription = null,
+                            modifier = Modifier.size(16.dp)
+                        )
+                    }
+                )
+            }
+        }
+        
         Spacer(modifier = Modifier.height(8.dp))
         if (call.responseBody.isNullOrEmpty()) {
             Text(
@@ -266,7 +338,12 @@ private fun ResponseTab(call: NetworkCall) {
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         } else {
-            CodeBlock(call.responseBody)
+            val displayBody = if (isBeautified) {
+                beautifyJson(call.responseBody)
+            } else {
+                call.responseBody
+            }
+            CodeBlock(displayBody)
         }
     }
 }
@@ -324,6 +401,23 @@ private fun CodeBlock(code: String) {
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         lineHeight = 16.sp
     )
+}
+
+private fun isJsonContent(body: String): Boolean {
+    val trimmed = body.trim()
+    return trimmed.startsWith("{") || trimmed.startsWith("[")
+}
+
+private fun beautifyJson(json: String): String {
+    return try {
+        val gson = com.google.gson.GsonBuilder()
+            .setPrettyPrinting()
+            .create()
+        val jsonElement = com.google.gson.JsonParser.parseString(json)
+        gson.toJson(jsonElement)
+    } catch (e: Exception) {
+        json
+    }
 }
 
 private fun generateCurl(call: NetworkCall): String {

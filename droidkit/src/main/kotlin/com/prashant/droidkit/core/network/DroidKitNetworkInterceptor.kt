@@ -28,7 +28,7 @@ internal class DroidKitNetworkInterceptor(context: Context) : Interceptor {
             request.body?.let { body ->
                 val buffer = Buffer()
                 body.writeTo(buffer)
-                buffer.readUtf8().take(10_000)
+                buffer.readUtf8().take(100_000)
             }
         } catch (e: Exception) {
             null
@@ -64,7 +64,7 @@ internal class DroidKitNetworkInterceptor(context: Context) : Interceptor {
                 responseStatus = mock.statusCode,
                 responseMessage = "Mocked",
                 responseHeaders = mock.headers,
-                responseBody = mock.responseBody.take(10_000),
+                responseBody = mock.responseBody.take(100_000),
                 duration = duration,
                 error = null,
                 isMocked = true
@@ -85,7 +85,7 @@ internal class DroidKitNetworkInterceptor(context: Context) : Interceptor {
                 val source = response.body?.source()
                 source?.request(Long.MAX_VALUE)
                 val buffer = source?.buffer
-                buffer?.clone()?.readUtf8()?.take(10_000)
+                buffer?.clone()?.readUtf8()?.take(100_000)
             } catch (e: Exception) {
                 null
             }
