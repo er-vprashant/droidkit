@@ -61,6 +61,33 @@ Compose and send local notifications with a live preview.
 - Handles `POST_NOTIFICATIONS` permission on Android 13+ with grant/settings flow
 - Preset quick-fill chips for common notification shapes
 
+### Network Inspector
+Inspect and mock HTTP/HTTPS traffic from your OkHttp client.
+
+- View all network requests and responses in real time
+- Filter by HTTP method (GET, POST, PUT, DELETE)
+- Inspect headers, request/response bodies (up to 100KB)
+- **JSON beautification** — toggle between raw and formatted JSON
+- **Mock responses** — return local data instead of hitting real APIs
+- Copy requests as cURL for Postman/terminal
+- Test error scenarios and edge cases offline
+- Performance tracking (request duration)
+
+**Setup (one-time):**
+```kotlin
+val client = OkHttpClient.Builder()
+    .addInterceptor(DroidKit.networkInterceptor())
+    .build()
+
+// If using Retrofit:
+val retrofit = Retrofit.Builder()
+    .client(client)
+    .baseUrl("https://api.example.com")
+    .build()
+```
+
+**Note:** Only captures OkHttp traffic. WebView and other network stacks are not supported.
+
 ## How to Launch
 
 DroidKit provides three ways to open the toolkit:
@@ -101,6 +128,7 @@ Then call `DroidKit.builder().init(context)` manually when you're ready.
 | `Module.STORAGE` | SharedPreferences + SQLite inspector |
 | `Module.DEEP_LINK` | Deep link tester with history & presets |
 | `Module.NOTIFICATIONS` | Push notification composer & tester |
+| `Module.NETWORK` | HTTP inspector with mocking support |
 
 ## Architecture
 
@@ -113,6 +141,7 @@ droidkit/
 │   ├── core/
 │   │   ├── intent/                  # IntentFirer, HistoryRepository
 │   │   ├── launcher/                # NotificationLauncher
+│   │   ├── network/                 # NetworkInterceptor, MockRepository
 │   │   ├── notification/            # ChannelManager, NotificationFirer
 │   │   ├── shake/                   # ShakeDetector (accelerometer)
 │   │   └── storage/                 # PrefsReader, DbInspector
@@ -121,6 +150,7 @@ droidkit/
 │   └── ui/
 │       ├── dashboard/               # Main dashboard screen
 │       ├── deeplink/                # Deep link tester UI + VM
+│       ├── network/                 # Network inspector UI + mock editor
 │       ├── notification/            # Notification tester UI + VM
 │       ├── storage/                 # Storage inspector UI + VM
 │       └── theme/                   # DroidKitTheme, DroidKitColors
