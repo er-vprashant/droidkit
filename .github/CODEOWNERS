@@ -1,0 +1,23 @@
+# CODEOWNERS file for DroidKit
+# These owners will be requested for review when someone opens a pull request.
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Default owner for everything in the repo
+* @er-vprashant
+
+# Core library code
+/droidkit/ @er-vprashant
+
+# Sample app
+/sample/ @er-vprashant
+
+# Documentation
+*.md @er-vprashant
+/docs/ @er-vprashant
+
+# CI/CD workflows
+/.github/ @er-vprashant
+
+# Build configuration
+*.gradle.kts @er-vprashant
+gradle.properties @er-vprashant

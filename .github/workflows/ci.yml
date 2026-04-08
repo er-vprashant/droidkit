@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, 'release/**' ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, 'release/**' ]
 
 jobs:
   build:
@@ -32,3 +32,6 @@ jobs:
 
       - name: Build sample app
         run: ./gradlew :sample:assembleDebug --no-daemon
+
+      - name: Run lint
+        run: ./gradlew :droidkit:lintDebug --no-daemon
