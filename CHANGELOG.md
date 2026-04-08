@@ -22,6 +22,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Updated README with Network Inspector documentation
+- Optimized CI workflow for cost reduction (~40% faster, 60% fewer steps)
+- Added Gradle caching to CI for faster builds
+- Added concurrency control to cancel redundant CI runs
+- Added 30-minute timeout protection for CI jobs
+
+### Infrastructure
+- Added CODEOWNERS file for automated review requests
+- Added branch protection guidelines and release workflow documentation
+- Created CHANGELOG.md for release tracking
 
 ### Fixed
 - Beautify button state now persists across tab switches
