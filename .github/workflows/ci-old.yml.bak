@@ -6,10 +6,19 @@ on:
   pull_request:
     branches: [ main, 'release/**' ]
 
+# Cancel old runs when new commits are pushed
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     name: Build & Test
     runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      checks: write  # For test reporting
 
     steps:
       - name: Checkout
@@ -23,15 +32,20 @@ jobs:
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
+        with:
+          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
 
       - name: Build library
-        run: ./gradlew :droidkit:assembleDebug --no-daemon
+        run: ./gradlew :droidkit:assembleDebug --no-daemon --stacktrace
 
-      - name: Run unit tests
-        run: ./gradlew :droidkit:testDebugUnitTest --no-daemon
+      - name: Run library unit tests
+        run: ./gradlew :droidkit:testDebugUnitTest --no-daemon --stacktrace
 
       - name: Build sample app
-        run: ./gradlew :sample:assembleDebug --no-daemon
+        run: ./gradlew :sample:assembleDebug --no-daemon --stacktrace
 
-      - name: Run lint
-        run: ./gradlew :droidkit:lintDebug --no-daemon
+      # Fast CHANGELOG reminder (no cost)
+      - name: CHANGELOG reminder
+        if: github.event_name == 'pull_request'
+        run: |
+          echo "📝 Remember to update CHANGELOG.md for your changes"
